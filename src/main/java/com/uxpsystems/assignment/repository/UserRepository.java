@@ -1,4 +1,4 @@
-package com.uxpsystems.assignment.service;
+package com.uxpsystems.assignment.repository;
 
 import com.uxpsystems.assignment.dao.User;
 import org.springframework.data.jpa.repository.JpaRepository;

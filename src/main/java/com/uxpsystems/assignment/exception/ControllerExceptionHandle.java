@@ -24,4 +24,11 @@ public class ControllerExceptionHandle {
         ResponseEntity<Message> responseEntity = new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
         return responseEntity;
     }
+
+    @ExceptionHandler(RequestNotAllowedException.class)
+    public ResponseEntity<Message> conflict(HttpServletRequest request, Exception e){
+        Message message = new Message(e.getMessage());
+        ResponseEntity<Message> responseEntity = new ResponseEntity<>(message, HttpStatus.CONFLICT);
+        return responseEntity;
+    }
 }

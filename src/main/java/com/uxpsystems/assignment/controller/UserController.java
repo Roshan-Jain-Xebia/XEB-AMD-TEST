@@ -3,6 +3,7 @@ package com.uxpsystems.assignment.controller;
 import com.uxpsystems.assignment.dao.User;
 import com.uxpsystems.assignment.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class UserController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public User createUser(@RequestBody User user){
         return userService.createUser(user);
     }
@@ -34,15 +36,17 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public User updateUser(@RequestBody User user, @PathVariable long id){
         user.setId(id);
         return userService.updateUser(user);
     }
 
-    @PutMapping
+    /*@PutMapping
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public User updateUser(@RequestBody User user){
         return userService.updateUser(user);
-    }
+    }*/
 
 }
 

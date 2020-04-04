@@ -1,11 +1,11 @@
+package com.uxpsystems.assignment.service;
+
 import com.uxpsystems.assignment.dao.User;
 import com.uxpsystems.assignment.exception.NotFoundException;
+import com.uxpsystems.assignment.exception.RequestNotAllowedException;
 import com.uxpsystems.assignment.exception.RequestNotValidException;
-import com.uxpsystems.assignment.service.UserRepository;
-import com.uxpsystems.assignment.service.UserService;
-import com.uxpsystems.assignment.service.UserServiceImpl;
+import com.uxpsystems.assignment.repository.UserRepository;
 import org.hamcrest.Matcher;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -15,7 +15,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -125,7 +124,7 @@ public class UserServiceTest {
         userService.createUser(newUser);
     }
 
-    @Test(expected = RequestNotValidException.class)
+    @Test(expected = RequestNotAllowedException.class)
     public void whenIdDuplicateRequestForUserReg_thenCreateUserShouldReturnError() {
 
         User newUser = new User();

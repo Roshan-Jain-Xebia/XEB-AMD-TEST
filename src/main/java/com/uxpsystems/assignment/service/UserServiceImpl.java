@@ -2,7 +2,9 @@ package com.uxpsystems.assignment.service;
 
 import com.uxpsystems.assignment.dao.User;
 import com.uxpsystems.assignment.exception.NotFoundException;
+import com.uxpsystems.assignment.exception.RequestNotAllowedException;
 import com.uxpsystems.assignment.exception.RequestNotValidException;
+import com.uxpsystems.assignment.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
@@ -42,7 +44,7 @@ public class UserServiceImpl implements UserService {
         }
         User user = getUser(id);
         userRepository.delete(user);
-      return user;
+        return user;
     }
 
     @Override
@@ -50,7 +52,7 @@ public class UserServiceImpl implements UserService {
     public User createUser(User user) {
         validateRequest(user);
         if(!isUsernameAvailable(user)){
-            throw  new RequestNotValidException("Username not available");
+            throw  new RequestNotAllowedException("Username not available");
         }
         return userRepository.save(user);
     }
@@ -58,11 +60,16 @@ public class UserServiceImpl implements UserService {
     @Override
     @Secured({"ROLE_ADMIN"})
     public User updateUser(User user) {
-        validateRequest(user);
-        if(null == user.getId()){
-            throw  new RequestNotValidException("User detail missing");
+        if(null == user.getId() ||  user.getId() == 0L){
+            throw new RequestNotValidException("User detail missing");
         }
-        getUser(user.getId());
+        validateRequest(user);
+
+        User regUser = getUser(user.getId());
+        if(!regUser.getUsername().equals(user.getUsername())){
+            throw new RequestNotValidException("To username change not allowed.");
+        }
+
         return userRepository.save(user);
     }
 
