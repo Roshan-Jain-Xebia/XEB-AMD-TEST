@@ -115,6 +115,15 @@ public class UserServiceTest {
     }
 
     @Test(expected = RequestNotValidException.class)
+    public void whenPasswordIsNull_thenCreateUserShouldReturnError() {
+        User newUser = new User();
+        newUser.setUsername("testUser");
+        newUser.setId(1L);
+        newUser.setStatus("Activated");
+        userService.createUser(newUser);
+    }
+
+    @Test(expected = RequestNotValidException.class)
     public void whenStatusIsNotValidUserReg_thenCreateUserShouldReturnError() {
         User newUser = new User();
         newUser.setUsername("testUser");
@@ -191,6 +200,41 @@ public class UserServiceTest {
     @Test(expected = RequestNotValidException.class)
     public void whenUpdateUserRequestIdNull_thenUpdateUserShouldReturnError() {
         User newUserData = new User();
+        userService.updateUser(newUserData);
+    }
+
+    @Test(expected = RequestNotValidException.class)
+    public void whenUpdateUserRequestIdZero_thenUpdateUserShouldReturnError() {
+        User newUserData = new User();
+        newUserData.setId(0L);
+        userService.updateUser(newUserData);
+    }
+
+    @Test(expected = RequestNotValidException.class)
+    public void whenUpdateUserRequestUserNameIsNull_thenUpdateUserShouldReturnError() {
+        User newUserData = new User();
+        newUserData.setId(1L);
+        newUserData.setPassword("******");
+        newUserData.setStatus("Activated");
+        userService.updateUser(newUserData);
+    }
+
+    @Test(expected = RequestNotValidException.class)
+    public void whenUpdateUserRequestStatusIsNull_thenUpdateUserShouldReturnError() {
+        User newUserData = new User();
+        newUserData.setId(1L);
+        newUserData.setPassword("******");
+        newUserData.setUsername("Activated");
+        userService.updateUser(newUserData);
+    }
+
+    @Test(expected = RequestNotValidException.class)
+    public void whenUpdateUserRequestStatusIsEmpty_thenUpdateUserShouldReturnError() {
+        User newUserData = new User();
+        newUserData.setId(1L);
+        newUserData.setPassword("******");
+        newUserData.setUsername("Name");
+        newUserData.setStatus("");
         userService.updateUser(newUserData);
     }
 

@@ -41,12 +41,5 @@ public class UserController {
         user.setId(id);
         return userService.updateUser(user);
     }
-
-    /*@PutMapping
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public User updateUser(@RequestBody User user){
-        return userService.updateUser(user);
-    }*/
-
 }
 

@@ -59,7 +59,7 @@ public class UserRepositoryTest {
         //remove user
         entityManager.remove(user);
         // get users
-         users = userRepository.findAll();
+        users = userRepository.findAll();
         // assert on non empty result
         assertThat(users.isEmpty())
                 .isEqualTo(true);

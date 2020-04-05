@@ -5,7 +5,11 @@ import com.uxpsystems.assignment.exception.NotFoundException;
 import com.uxpsystems.assignment.exception.RequestNotAllowedException;
 import com.uxpsystems.assignment.exception.RequestNotValidException;
 import com.uxpsystems.assignment.repository.UserRepository;
+import org.hibernate.annotations.Cache;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +32,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Secured({"ROLE_ADMIN","ROLE_USER"})
+    //@Cache()
+    //@Cacheable(value = "usersCache",key = "#id",unless = "#result==null")
     public User getUser(long id) {
         Optional<User> byId = userRepository.findById(id);
         if(!byId.isPresent()){
@@ -38,8 +44,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Secured({"ROLE_ADMIN"})
+    //@CacheEvict(value = "usersCache",key = "#id")
     public User deleteUser(long id) {
-        if(id == 0){
+        if(isNullOrZero(id)){
             throw  new RequestNotValidException("User detail missing");
         }
         User user = getUser(id);
@@ -59,15 +66,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Secured({"ROLE_ADMIN"})
+    //@CachePut(value = "usersCache",key = "#id")
     public User updateUser(User user) {
-        if(null == user.getId() ||  user.getId() == 0L){
+        if(isNullOrZero(user.getId())){
             throw new RequestNotValidException("User detail missing");
         }
         validateRequest(user);
 
         User regUser = getUser(user.getId());
         if(!regUser.getUsername().equals(user.getUsername())){
-            throw new RequestNotValidException("To username change not allowed.");
+            throw new RequestNotValidException("Username change not allowed.");
         }
 
         return userRepository.save(user);
@@ -82,16 +90,24 @@ public class UserServiceImpl implements UserService {
     }
 
     private void validateRequest(User user){
-        if(user.getUsername()==null || user.getUsername().isEmpty()){
+        if(isNullOrEmpty(user.getUsername())){
             throw  new RequestNotValidException("User username should not be empty");
         }
 
-        if(user.getPassword()==null || user.getPassword().isEmpty()){
+        if(isNullOrEmpty(user.getPassword())){
             throw  new RequestNotValidException("User password should not be empty");
         }
 
-        if(user.getStatus()==null || user.getStatus().isEmpty() || !STATUS_VALUES.contains(user.getStatus().toUpperCase())){
+        if(isNullOrEmpty(user.getStatus()) || !STATUS_VALUES.contains(user.getStatus().toUpperCase())){
             throw  new RequestNotValidException("User status only permit Activated/Deactivated values");
         }
+    }
+
+    private boolean isNullOrEmpty(String strValue){
+        return strValue == null ? true : strValue.isEmpty();
+    }
+
+    private boolean isNullOrZero(Long longValue){
+        return longValue == null ? true : longValue == 0;
     }
 }

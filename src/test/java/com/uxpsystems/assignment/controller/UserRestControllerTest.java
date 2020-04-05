@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uxpsystems.assignment.dao.User;
 import com.uxpsystems.assignment.exception.NotFoundException;
 import com.uxpsystems.assignment.exception.RequestNotAllowedException;
+import com.uxpsystems.assignment.exception.RequestNotValidException;
 import com.uxpsystems.assignment.service.UserService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +42,7 @@ public class UserRestControllerTest {
 
     @WithMockUser(username="admin")
     @Test
-    public void test_getAllUsers_Success()
+    public void testGetAllUsers_Success()
             throws Exception {
         User user = new User();
         user.setUsername("guest");
@@ -64,7 +65,7 @@ public class UserRestControllerTest {
 
     @WithMockUser(username="admin")
     @Test
-    public void test_getUser_NotFoundError()
+    public void testGetUser_NotFoundError()
             throws Exception {
         User user = new User();
         user.setUsername("guest");
@@ -84,7 +85,29 @@ public class UserRestControllerTest {
 
     @WithMockUser(username="admin")
     @Test
-    public void test_createUser_success()
+    public void testGetUserById_success()
+            throws Exception {
+        User user = new User();
+        user.setId(1L);
+        user.setUsername("guest");
+        user.setPassword("Guest@1234");
+        user.setStatus("Activated");
+        List<User> allusers = Arrays.asList(user);
+
+        given(userService.getUser(1L)).willReturn(user);
+
+        mvc.perform(MockMvcRequestBuilders.get("/user/{id}", "1")
+                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username", is(user.getUsername())));
+
+        verify(userService, times(1)).getUser(1L);
+        verifyNoMoreInteractions(userService);
+    }
+
+    @WithMockUser(username="admin")
+    @Test
+    public void testCreateUser_success()
             throws Exception {
         User newUser = new User();
         newUser.setUsername("guest");
@@ -102,7 +125,7 @@ public class UserRestControllerTest {
 
     @WithMockUser(username="user", roles = {"USER"})
     @Test
-    public void test_createUser_AuthError()
+    public void testCreateUser_AuthError()
             throws Exception {
         User newUser = new User();
         newUser.setUsername("guest");
@@ -119,7 +142,7 @@ public class UserRestControllerTest {
 
     @WithMockUser(username="admin")
     @Test
-    public void test_createUser_UsernameNotAvailableError()
+    public void testCreateUserWithDuplicateUsername_usernameNotAvailableError()
             throws Exception {
         User newUser = new User();
         newUser.setUsername("guest");
@@ -137,7 +160,7 @@ public class UserRestControllerTest {
 
     @WithMockUser(username="admin")
     @Test
-    public void test_deleteUser_success()
+    public void testDeleteUser_success()
             throws Exception {
         User deletedUser = new User();
         deletedUser.setId(1L);
@@ -156,7 +179,7 @@ public class UserRestControllerTest {
 
     @WithMockUser(username="admin")
     @Test
-    public void test_deleteUser_NotFoundError()
+    public void testDeleteUser_NotFoundError()
             throws Exception {
 
         given(userService.deleteUser(1L)).willThrow(new NotFoundException());
@@ -170,7 +193,7 @@ public class UserRestControllerTest {
 
     @WithMockUser(username="admin")
     @Test
-    public void test_updateUser_success()
+    public void testUpdateUser_success()
             throws Exception {
         User updateUser = new User();
         updateUser.setUsername("guest");
@@ -188,7 +211,43 @@ public class UserRestControllerTest {
 
     @WithMockUser(username="admin")
     @Test
-    public void test_updateUser_ById_BadRequest()
+    public void testUpdateUserWithDuplicateUserName_thenConflictError()
+            throws Exception {
+        User updateUser = new User();
+        updateUser.setUsername("guest");
+        updateUser.setPassword("Guest@1234");
+        updateUser.setStatus("Activated");
+
+        given(userService.updateUser(Mockito.any(User.class))).willThrow(new RequestNotAllowedException());
+
+        mvc.perform(MockMvcRequestBuilders
+                .put("/user/{id}", "1")
+                .content(asJsonString(updateUser))
+                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isConflict());
+    }
+
+    @WithMockUser(username="admin")
+    @Test
+    public void testUpdateUserWithIncorrectStatus_thenReturnError()
+            throws Exception {
+        User updateUser = new User();
+        updateUser.setUsername("guest");
+        updateUser.setPassword("Guest@1234");
+        updateUser.setStatus("Activatedlklj");
+
+        given(userService.updateUser(Mockito.any(User.class))).willThrow(new RequestNotValidException());
+
+        mvc.perform(MockMvcRequestBuilders
+                .put("/user/{id}", "1")
+                .content(asJsonString(updateUser))
+                .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @WithMockUser(username="admin")
+    @Test
+    public void testUpdateUserWithIncorrectIdFormat_thenReturnBadRequest()
             throws Exception {
         User updateUser = new User();
         updateUser.setUsername("guest");
@@ -205,7 +264,7 @@ public class UserRestControllerTest {
 
     @WithMockUser(username="admin")
     @Test
-    public void test_updateUser_MethodNotAllowedError()
+    public void testUpdateUserWithoutId_MethodNotAllowedError()
             throws Exception {
         User updateUser = new User();
         updateUser.setUsername("guest");
