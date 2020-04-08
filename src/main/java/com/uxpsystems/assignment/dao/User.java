@@ -1,8 +1,6 @@
 package com.uxpsystems.assignment.dao;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,7 +10,6 @@ import java.io.Serializable;
 
 @Entity
 @JsonSerialize
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class User implements Serializable {
     
     @Id
@@ -21,6 +18,16 @@ public class User implements Serializable {
     private String username;
     private String password;
     private String status;
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", status='" + status + '\'' +
+                '}';
+    }
 
     public User() {
         super();

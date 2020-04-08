@@ -37,10 +37,13 @@ Spring Boot\
 Spring Security\
 Hibernate\
 H2\
+Hazelcast\
+slf4j\
 Spring Test\
 Jacoco\
 Swagger\
-Intellij\
+Postman\
+Intellij
 
 <h3>Build and Deployment</h3>
 build  war  >> mvn install\
@@ -69,5 +72,6 @@ Two users are configured in memory with following credentials and role\
 | ------------- | ------------- |------------- |
 | user | User@1234 | USER |
 | admin  | Admin@1234  | ADMIN |
+
 
 
